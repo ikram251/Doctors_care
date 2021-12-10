@@ -1,90 +1,98 @@
 const Socket = require("websocket").server
 const http = require("http")
 
-const server = http.createServer((req,res)=> {})
+const server = http.createServer((req, res) => {})
 
-server.listen(3200, ()=> {
-    console.log("On port 3200 listening")
+server.listen(3000, () => {
+    console.log("Listening on port 3000...")
 })
 
-const webSocket = new Socket({httpServer: server})
+const webSocket = new Socket({ httpServer: server })
 
 let users = []
 
-webSocket.on('request',(req)=>{
+webSocket.on('request', (req) => {
     const connection = req.accept()
-    
 
     connection.on('message', (message) => {
         const data = JSON.parse(message.utf8Data)
+
         const user = findUser(data.username)
-        switch(data.type){
+
+        switch(data.type) {
             case "store_user":
-                if(user != null){
+
+                if (user != null) {
                     return
                 }
-                const newuser = {
-                    conn: connection,
-                    username: data.username
+
+                const newUser = {
+                     conn: connection,
+                     username: data.username
                 }
 
-                users.push(newuser)
-                console.log(newuser.username)
+                users.push(newUser)
+                console.log(newUser.username)
                 break
             case "store_offer":
-                if(user == null)
+                if (user == null)
                     return
                 user.offer = data.offer
                 break
+            
             case "store_candidate":
-                if(user == null){
+                if (user == null) {
                     return
                 }
-                if(server.cadidates == null)
-                    user.cadidates = []
-                user.cadidates.push(data.candidate)
+                if (user.candidates == null)
+                    user.candidates = []
+                
+                user.candidates.push(data.candidate)
                 break
             case "send_answer":
-                if(user==null){
+                if (user == null) {
                     return
-
                 }
+
                 sendData({
                     type: "answer",
                     answer: data.answer
                 }, user.conn)
                 break
             case "send_candidate":
-                if(user==null){
+                if (user == null) {
                     return
-
                 }
+
                 sendData({
                     type: "candidate",
-                    answer: data.candidate
+                    candidate: data.candidate
                 }, user.conn)
                 break
             case "join_call":
-                if(user == null){
+                if (user == null) {
                     return
                 }
+
                 sendData({
                     type: "offer",
                     offer: user.offer
                 }, connection)
-
-                user.cadidates.forEach(candidate => {
+                
+                user.candidates.forEach(candidate => {
                     sendData({
                         type: "candidate",
                         candidate: candidate
                     }, connection)
                 })
+
                 break
         }
     })
-    connection.on('close',(reason,description) => {
+
+    connection.on('close', (reason, description) => {
         users.forEach(user => {
-            if(user.conn == connection){
+            if (user.conn == connection) {
                 users.splice(users.indexOf(user), 1)
                 return
             }
@@ -92,13 +100,12 @@ webSocket.on('request',(req)=>{
     })
 })
 
-function sendData(data,conn){
+function sendData(data, conn) {
     conn.send(JSON.stringify(data))
 }
 
-function findUser(username){
-    for(let i=0; i<users.length; i++){
-        if(users[i].username == username)
+function findUser(username) {
+    for (let i = 0;i < users.length;i++) {
+        if (users[i].username == username)
             return users[i]
     }
-}
