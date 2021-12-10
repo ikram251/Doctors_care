@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="logo">
+    <img src="../images/logo.png" alt="logo">
+</div>
+<div class="center">
+    <div class="dr_call">
+        <h1>Welcome to Doctor's Call</h1>
+    </div>
+</div>
+    <div class="login">
+        <div>
+            Username:
+            <input type="text" id="username-input" placeholder="Enter Doctor name"><br>
+            <br>
+            <button onclick="sendUsername()">Send</button>
+            <button onclick="startCall()">Start call</button>
+        </div>
+    </div>
+    <div id="video-call-div">
+        <video id="local-video" autoplay></video>
+        <video id="remote-video" autoplay></video>
+        <div class="call-action-div">
+            <button onclick="muteVideo()">Mute Video</button>
+            <button onclick="muteAudio()">Mute Audio</button>
+        </div>
+    </div>
+    <script src="./sender_side.js"></script>
+</body>
+</html>
